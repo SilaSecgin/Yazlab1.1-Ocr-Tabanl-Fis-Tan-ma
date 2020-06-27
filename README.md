@@ -1,0 +1,1 @@
+# Yazlab1.1-Ocr-Tabanl-Fis-Tan-ma
