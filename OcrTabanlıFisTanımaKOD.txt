@@ -1,0 +1,565 @@
+--------Controller.java----------
+
+package main;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.table.DefaultTableModel;
+
+public class Controller {
+
+	
+	// https://stackoverflow.com/questions/6382877/how-to-show-data-from-database-to-jtable-of-java-swing-controls
+
+	static Connection con;
+	public static DefaultTableModel model = new DefaultTableModel();
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		// connection();
+		// delete();
+		//insert("Test","2","22/10/2019","1888");
+		//screenWrite();
+		// search2();
+		 try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void connection() {
+		String connectionUrl = "jdbc:sqlserver://localhost:1433;databaseName=Yazlab1;user=sa;password=sqlserver";
+		try {
+			con = DriverManager.getConnection(connectionUrl);
+			// System.out.println("dsdxa");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void insert(String isletmeAdi, String fisNo, String tarih, String toplam) {
+
+		try {
+
+			String query = " INSERT INTO TumBilgiler1 (isletmeAdi, tarih, fisNo, toplam) VALUES (?,?,?,?)";
+			PreparedStatement preparedStmt = con.prepareStatement(query);
+			preparedStmt.setString(1, isletmeAdi);
+			preparedStmt.setString(2, tarih);
+			preparedStmt.setString(3, fisNo);
+			preparedStmt.setString(4, toplam);
+
+			preparedStmt.execute();
+
+			System.out.println(fisNo + " Nolu fis Basari ile eklendi.");
+		} catch (Exception e) {
+			System.err.println(fisNo + " Nolu fisi Ekleme Sirasinda Hata Olustu!");
+			System.err.println(e.getMessage());
+		}
+	}
+
+	public static void screenWrite() {
+
+		String query = "Select * From TumBilgiler1";
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(query);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			while (rs.next()) {
+				System.out.println("ÝþletmeAdý:" + rs.getString("isletmeAdi") + "Tarih:" + rs.getString("tarih")
+						+ "FisNo:" + rs.getString("fisNo") + "Toplam:" + rs.getString("toplam"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void delete() {
+		// String sql = "delete from TumBilgiler1 where fisNo IS NULL";
+		// String sql = "delete from TumBilgiler1 where isletmeAdi IS NULL";
+		/// String sql = "delete from TumBilgiler1 where tarih LIKE %0%";
+		String sql = "delete from TumBilgiler1 where tarih = 1";
+
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		{
+
+			try {
+				stmt.executeUpdate(sql);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Kayýtlar Baþarýyla Silindi!");
+		}
+	}
+
+	public static void search(String iAdi, String iTarih) {
+
+		String query = "Select * From TumBilgiler1 where isletmeadi LIKE '%" + iAdi + "%' AND tarih LIKE '%" + iTarih
+				+ "%'";
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(query);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String uAdi = null;
+		String uTarih = null;
+		String uNo = null;
+		String uToplam = null;
+		int a = 0;
+		try {
+			while (rs.next()) {
+				uAdi = rs.getString("isletmeAdi");
+				uTarih = rs.getString("tarih");
+				uNo = rs.getString("fisNo");
+				uToplam = rs.getString("toplam");
+				model.addRow(new Object[] { uAdi, uTarih, uNo, uToplam });
+				a++;
+				// System.out.println("ÝþletmeAdý:"+rs.getString("isletmeAdi")+"Tarih:"+rs.getString("tarih")+"FisNo:"+rs.getString("fisNo")+"Toplam:"+rs.getString("toplam"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void show() {
+
+		String query = "Select * From TumBilgiler1";
+		Statement stmt = null;
+		try {
+			stmt = con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ResultSet rs = null;
+		DefaultTableModel tm = (DefaultTableModel) Main.table.getModel();
+		tm.setRowCount(0);
+		try {
+			rs = stmt.executeQuery(query);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String uAdi = null;
+		String uTarih = null;
+		String uNo = null;
+		String uToplam = null;
+		int a = 0;
+		try {
+			while (rs.next()) {
+				uAdi = rs.getString("isletmeAdi");
+				uTarih = rs.getString("tarih");
+				uNo = rs.getString("fisNo");
+				uToplam = rs.getString("toplam");
+				model.addRow(new Object[] { uAdi, uTarih, uNo, uToplam });
+				a++;
+				// System.out.println("ÝþletmeAdý:"+rs.getString("isletmeAdi")+"Tarih:"+rs.getString("tarih")+"FisNo:"+rs.getString("fisNo")+"Toplam:"+rs.getString("toplam"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+}
+
+--------- Main.java ---------
+package main;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+
+public class Main extends JFrame {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField isletmeAdi;
+	private static JTextField tarih, trh, fis, tplm;
+	private static JTextArea label2;
+	private static String path, str;
+	private static String prcToplam, prcTarih, prcIsletme, prcFis;
+	public static JTable table;
+	public static int parcalaAktif = 0;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+
+				try {
+					Main frame = new Main();
+					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public Main() {
+
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JButton sec = new JButton("Dosya Seç");
+		sec.setBounds(120, 30, 150, 23);
+		contentPane.add(sec);
+
+		JLabel isletme = new JLabel("Ýþletme Adý");
+		isletme.setBounds(1300, 60, 101, 24);
+		contentPane.add(isletme);
+
+		JLabel tr = new JLabel("Tarih");
+		tr.setBounds(1300, 90, 81, 14);
+		contentPane.add(tr);
+
+		isletmeAdi = new JTextField();
+		isletmeAdi.setBounds(1400, 60, 200, 20);
+		contentPane.add(isletmeAdi);
+		isletmeAdi.setColumns(10);
+
+		tarih = new JTextField();
+		tarih.setBounds(1400, 90, 200, 20);
+		contentPane.add(tarih);
+		tarih.setColumns(10);
+
+		JButton Ara = new JButton("Ara");
+		Ara.setBounds(1400, 150, 89, 23);
+		contentPane.add(Ara);
+
+		String[] columNames = { "Ýþletme Adi", "Tarih", "Fiþ No", "Toplam" };
+
+		Controller.model.setColumnIdentifiers(columNames);
+		table = new JTable();
+		table.setModel(Controller.model);
+
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setFillsViewportHeight(true);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+		table.setBounds(500, 250, 1000, 400);
+		contentPane.add(scroll);
+		contentPane.setVisible(true);
+		contentPane.add(table);
+
+		label2 = new JTextArea(2, 20);
+		label2.setBounds(1550, 260, 300, 700);
+
+		label2.setWrapStyleWord(true);
+		label2.setLineWrap(true);
+		label2.setOpaque(false);
+		label2.setEditable(false);
+		label2.setFocusable(false);
+
+		label2.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 16));
+		contentPane.add(label2);
+
+		JButton okuu = new JButton("Oku");
+		okuu.setBounds(100, 600, 89, 23);
+		contentPane.add(okuu);
+
+		JButton parcalaa = new JButton("Parçala");
+		parcalaa.setBounds(200, 600, 89, 23);
+		contentPane.add(parcalaa);
+
+		trh = new JTextField();
+		trh.setBounds(150, 700, 200, 30);
+		trh.setText("TARÝH");
+		contentPane.add(trh);
+		trh.setVisible(false);
+
+		fis = new JTextField();
+		fis.setBounds(150, 750, 200, 30);
+		fis.setText("FÝÞ NO");
+		contentPane.add(fis);
+		fis.setVisible(false);
+
+		tplm = new JTextField();
+		tplm.setBounds(150, 800, 200, 30);
+		tplm.setText("TOPLAM");
+		contentPane.add(tplm);
+		tplm.setVisible(false);
+
+		JButton kaydet3 = new JButton("Kaydet");
+		kaydet3.setBounds(150, 850, 89, 23);
+		contentPane.add(kaydet3);
+
+		JLabel label = new JLabel("");
+		label.setBounds(60, 70, 300, 500);
+
+		label.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 16));
+		contentPane.add(label);
+
+		sec.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				JFileChooser file = new JFileChooser();
+				file.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Fotoðraf", "jpg", "png");
+				file.addChoosableFileFilter(filter);
+				int result = file.showSaveDialog(null);
+
+				if (result == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = file.getSelectedFile();
+					path = selectedFile.getAbsolutePath();
+					ImageIcon imageIcn = new ImageIcon(path); // seçilen resim yolu
+					Image image = imageIcn.getImage(); // image çevirme þlemi
+					Image yeniimg = image.getScaledInstance(300, 500, java.awt.Image.SCALE_SMOOTH); // label a göre
+																									// boyutlandýrma
+					imageIcn = new ImageIcon(yeniimg);
+					label.setIcon(imageIcn); // labele set etme
+
+				} else if (result == JFileChooser.CANCEL_OPTION) {
+					System.out.println("Dosya Seçilmedi");
+				}
+			}
+
+		});
+
+		okuu.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				oku();
+				fis.setVisible(true);
+				trh.setVisible(true);
+				tplm.setVisible(true);
+			}
+		});
+
+		parcalaa.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				parcala();
+				parcalaAktif = 1;
+			}
+		});
+
+		kaydet3.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+
+				if (prcToplam != null && !prcToplam.isEmpty() && prcIsletme != null && !prcIsletme.isEmpty()
+						&& prcTarih != null && !prcTarih.isEmpty() && prcFis != null && !prcFis.isEmpty()
+						&& parcalaAktif == 1) {
+					Controller test = new Controller();
+					test.connection();
+					test.insert(prcIsletme, prcFis, prcTarih, prcToplam);
+
+					test.screenWrite();
+					test.show();
+					JOptionPane.showMessageDialog(null, "Kaydetme Ýþlemi Baþarýlý!");
+				} else {
+					JOptionPane.showMessageDialog(null, "Boþ okunan veri var veya parçalaya iþlemi yapýlmadý.!");
+				}
+				parcalaAktif = 0;
+			}
+		});
+
+		Ara.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
+				Controller a = new Controller();
+
+				if (isletmeAdi != null && !isletmeAdi.getText().isEmpty()
+						|| tarih != null && !tarih.getText().isEmpty()) {
+					a.connection();
+					Controller.model.setNumRows(0);
+					a.search(isletmeAdi.getText(), tarih.getText());
+				} else {
+					a.connection();
+					a.show();
+				}
+
+			}
+		});
+
+	}
+
+	public static void oku() {
+
+		File file = new File(path);
+	
+
+		/*BufferedImage origin = null;
+		try {
+			origin = ImageIO.read(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		File dest = new File("C:\\Users\\lenovo\\Desktop\\Tess4J\\test\\output.png");
+		try {// 1400,2161
+			ImageIO.write(resize(1400, 2161, origin), "PNG", dest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
+		
+		Tesseract it = new Tesseract();
+
+		it.setDatapath("C:\\Users\\lenovo\\Desktop\\Tess4J\\tessdata");
+		it.setLanguage("tur");
+		// doing OCR on the image
+		// and storing result in string str
+
+		try {
+			str = it.doOCR(new File(path));
+			//str = it.doOCR(dest); 
+		} catch (TesseractException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		label2.setText(str);
+		/// UZUN FÝÞLERDE CONSOLE DAN BAKICAM EKRANA SIÐMIYOR.
+		System.out.println(str);
+
+	}
+
+	public static BufferedImage resize(int targetWidth, int targetHeight, BufferedImage src) {
+		double scaleW = (double) targetWidth / (double) src.getWidth();
+		double scaleH = (double) targetHeight / (double) src.getHeight();
+
+		double scale = scaleW < scaleH ? scaleW : scaleH;
+
+		BufferedImage result = new BufferedImage((int) (src.getWidth() * scale), (int) (src.getHeight() * scale),
+				BufferedImage.TYPE_INT_ARGB);
+
+		Graphics2D g2d = result.createGraphics();
+		g2d.drawImage(src, 0, 0, result.getWidth(), result.getHeight(), null);
+		g2d.dispose();
+
+		return result;
+	}
+
+	public static void parcala() {
+
+		int a = str.indexOf(tplm.getText());
+		a = a + tplm.getText().length();
+		int b = a + 7;
+		System.out.println("Toplam " + str.substring(a, b));
+		prcToplam = str.substring(a, b);
+
+		int a2 = str.indexOf(trh.getText());
+		a2 = a2 + trh.getText().length();
+		int b2 = a2 + 12;
+		System.out.println("Tarih " + str.substring(a2, b2));
+		prcTarih = str.substring(a2, b2);
+
+		int a3 = str.indexOf(fis.getText());
+		a3 = a3 + fis.getText().length();
+		int b3 = a3 + 10;
+		// System.out.println("Fis no "+str.substring(a3,b3));
+
+		prcFis = str.substring(a3, b3);
+		int i = Integer.parseInt(prcFis.replaceAll("[\\D]", ""));
+
+		prcFis = String.valueOf(i);
+		System.out.println("Fiþ No " + prcFis);
+
+		System.out.println("Ýþletme " + str.substring(0, 15));
+		prcIsletme = str.substring(0, 15);
+
+		JOptionPane.showMessageDialog(null, "Parçalama Ýþlemi Baþarýlý!");
+	}
+
+}
